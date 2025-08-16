@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aravindan Events - Crafting Unforgettable Moments</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter (for body) and Playfair Display (for headings - elegant serif) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome for Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      /* Custom CSS for smooth scrolling and general styles */
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #121212; /* Dark background */
+        color: #e0e0e0; /* Light text */
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: "Playfair Display", serif; /* Elegant font for headings */
+      }
+
+      /* Custom colors for Tailwind - updated for black theme */
+      .bg-dark-charcoal {
+        background-color: #1a1a1a;
+      }
+      .text-dark-charcoal {
+        color: #1a1a1a;
+      }
+      .bg-golden-yellow {
+        background-color: #e5a83d;
+      }
+      .text-golden-yellow {
+        color: #e5a83d;
+      }
+      .border-golden-yellow {
+        border-color: #e5a83d;
+      }
+
+      /* Slider specific styles */
+      .slider-item {
+        display: none; /* Hide all slides by default */
+        transition: opacity 1s ease-in-out;
+        opacity: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        filter: brightness(0.7); /* Slightly dim images for text contrast */
+      }
+      .slider-item.active {
+        display: block;
+        opacity: 1;
+      }
+      .slider-overlay {
+        background-color: rgba(
+          0,
+          0,
+          0,
+          0.4
+        ); /* Slightly lighter overlay for text readability */
+      }
+
+      /* Scroll to top button */
+      #scrollToTopBtn {
+        display: none; /* Hidden by default */
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 99;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 15px;
+        border-radius: 50%;
+        font-size: 24px;
+        line-height: 1; /* Adjust line height for icon centering */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); /* Enhanced shadow */
+        transition: background-color 0.3s ease, transform 0.3s ease;
+      }
+      #scrollToTopBtn:hover {
+        transform: translateY(-4px); /* More pronounced hover effect */
+      }
+
+      /* Animations on Scroll */
+      .animate-on-scroll {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+      }
+      .animate-on-scroll.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Specific slide-in animations */
+      .slide-in-left {
+        opacity: 0;
+        transform: translateX(-50px);
+        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+      }
+      .slide-in-left.is-visible {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      .slide-in-right {
+        opacity: 0;
+        transform: translateX(50px);
+        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+      }
+      .slide-in-right.is-visible {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      /* Delay for sequential animations */
+      .delay-100 {
+        transition-delay: 0.1s;
+      }
+      .delay-200 {
+        transition-delay: 0.2s;
+      }
+      .delay-300 {
+        transition-delay: 0.3s;
+      }
+      .delay-400 {
+        transition-delay: 0.4s;
+      }
+      .delay-500 {
+        transition-delay: 0.5s;
+      }
+
+      /* Coming Soon Overlay */
+      .coming-soon-card {
+        position: relative;
+        pointer-events: none; /* Make card non-interactive */
+      }
+      .coming-soon-overlay {
+        position: absolute;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.7); /* Darker overlay */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.75rem; /* Match card border-radius */
+        z-index: 10;
+      }
+      .coming-soon-badge {
+        background-color: #e5a83d; /* Golden yellow badge */
+        color: #1a1a1a; /* Dark text */
+        padding: 0.5rem 1rem;
+        border-radius: 9999px; /* Pill shape */
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+      /* Style for disabled hover effect */
+      .coming-soon-card:hover {
+        transform: none; /* Disable transform on hover */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); /* Keep original shadow or slightly darker */
+      }
+      .coming-soon-card .text-golden-yellow {
+        filter: grayscale(100%); /* Desaturate icon */
+        opacity: 0.6;
+      }
+      .coming-soon-card h3,
+      .coming-soon-card p {
+        opacity: 0.7; /* Dim text */
+      }
+
+      /* Phone Button Animation */
+      .phone-button {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        background-color: #e5a83d;
+        color: #1a1a1a;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        transition: all 0.3s ease-in-out;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1; /* Ensure button content is above pseudo-elements */
+      }
+
+      .phone-button::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border: 2px solid transparent;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease-in-out;
+        z-index: -1; /* Place behind button content */
+      }
+
+      .phone-button:hover {
+        background-color: #d49a32; /* Slightly darker golden on hover */
+        transform: scale(1.02);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      }
+
+      .phone-button:hover::before {
+        border-color: #e5a83d; /* Golden yellow border on hover */
+        box-shadow: 0 0 15px #e5a83d; /* Subtle glow effect */
+      }
+      /* Dropdown styles for phone numbers */
+      .phone-dropdown {
+        position: relative;
+        display: inline-block;
+      }
+
+      .phone-dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #1a1a1a; /* Dark background */
+        min-width: 200px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.6);
+        z-index: 100;
+        border-radius: 0.5rem;
+        right: 0; /* Align to the right of the button */
+        top: 100%; /* Position below the button */
+        margin-top: 0.5rem; /* Space between button and dropdown */
+        overflow: hidden; /* Ensure rounded corners apply to children */
+      }
+
+      .phone-dropdown-content a {
+        color: #e0e0e0;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        transition: background-color 0.3s ease;
+      }
+
+      .phone-dropdown-content a:hover {
+        background-color: #333333; /* Slightly lighter hover for dropdown items */
+        color: #e5a83d;
+      }
+
+      .phone-dropdown:hover .phone-dropdown-content {
+        display: block;
+      }
+
+      /* Loading Overlay Styles */
+      #loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(
+          0,
+          0,
+          0,
+          0.95
+        ); /* Very dark, almost black overlay */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000; /* Ensure it's on top of everything */
+        opacity: 1;
+        transition: opacity 0.5s ease-out; /* Smooth fade out */
+      }
+      #loading-overlay.hidden {
+        opacity: 0;
+        pointer-events: none; /* Allow clicks through once faded */
+      }
+      #loading-overlay img {
+        max-width: 250px; /* Adjust size as needed */
+        max-height: 250px;
+        border-radius: 50%; /* Slightly rounded corners for the GIF */
+        box-shadow: 0 0 20px rgba(229, 168, 61, 0.5); /* Golden glow */
+      }
+    </style>
+  </head>
+  <body class="antialiased">
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+      <img src="/assets/images/loading.gif" alt="Loading..." />
+    </div>
+    <!-- Header / Big Toolbar -->
+    <header class="bg-dark-charcoal text-white shadow-lg fixed w-full z-50">
+      <nav
+        class="container mx-auto px-6 py-4 flex items-center justify-between"
+      >
+        <!-- Logo -->
+        <div class="flex items-center">
+          <img
+            src="assets/images/logo-transparent.png"
+            alt="Aravindan Events Logo"
+            class="h-16 w-auto rounded-full mr-3 border-2 border-golden-yellow p-0.5"
+          />
+          <a href="#home" class="text-3xl font-bold tracking-wide"
+            >Aravindan <span class="text-golden-yellow">Events</span></a
+          >
+        </div>
+
+        <!-- Navigation Links (Desktop) -->
+        <div class="hidden md:flex space-x-8 text-lg">
+          <a
+            href="#home"
+            class="hover:text-golden-yellow transition duration-300"
+            >Home</a
+          >
+          <a
+            href="#services"
+            class="hover:text-golden-yellow transition duration-300"
+            >Services</a
+          >
+          <a
+            href="#gallery"
+            class="hover:text-golden-yellow transition duration-300"
+            >Gallery</a
+          >
+          <a
+            href="#team"
+            class="hover:text-golden-yellow transition duration-300"
+            >Team</a
+          >
+          <a
+            href="#contact"
+            class="hover:text-golden-yellow transition duration-300"
+            >Contact</a
+          >
+          <!-- Phone Number Dropdown -->
+          <div class="phone-dropdown ml-8">
+            <button class="phone-button focus:outline-none">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-phone mr-2"
+              >
+                <path
+                  d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-0.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-0.45 12.84 12.84 0 0 0 2.81 0.7A2 2 0 0 1 22 16.92z"
+                />
+              </svg>
+              Call Us
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-chevron-down ml-2"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+            <div class="phone-dropdown-content">
+              <a href="tel:+919071118197">+91 90711 18197</a>
+              <a href="tel:+919008871144">+91 90088 71144</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <div class="md:hidden">
+          <button id="mobile-menu-button" class="text-white focus:outline-none">
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16m-7 6h7"
+              ></path>
+            </svg>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Mobile Menu (Hidden by default) -->
+      <div id="mobile-menu" class="hidden md:hidden bg-dark-charcoal pb-4">
+        <a
+          href="#home"
+          class="block py-2 px-6 text-white hover:bg-golden-yellow hover:text-dark-charcoal transition duration-300"
+          >Home</a
+        >
+        <a
+          href="#services"
+          class="block py-2 px-6 text-white hover:bg-golden-yellow hover:text-dark-charcoal transition duration-300"
+          >Services</a
+        >
+        <a
+          href="#gallery"
+          class="block py-2 px-6 text-white hover:bg-golden-yellow hover:text-dark-charcoal transition duration-300"
+          >Gallery</a
+        >
+        <a
+          href="#team"
+          class="block py-2 px-6 text-white hover:bg-golden-yellow hover:text-dark-charcoal transition duration-300"
+          >Team</a
+        >
+        <a
+          href="#contact"
+          class="block py-2 px-6 text-white hover:bg-golden-yellow hover:text-dark-charcoal transition duration-300"
+          >Contact</a
+        >
+        <!-- Mobile Phone Numbers -->
+        <div class="mt-2 mx-6 border-t border-gray-700 pt-2">
+          <p class="text-gray-400 text-sm mb-2">Call Us:</p>
+          <a
+            href="tel:+919071118197"
+            class="block py-2 px-4 text-white hover:bg-golden-yellow hover:text-dark-charcoal transition duration-300 rounded-md mb-1"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-phone inline-block mr-2"
+            >
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-0.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-0.45 12.84 12.84 0 0 0 2.81 0.7A2 2 0 0 1 22 16.92z"
+              />
+            </svg>
+            +91 90711 18197
+          </a>
+          <a
+            href="tel:+919008871144"
+            class="block py-2 px-4 text-white hover:bg-golden-yellow hover:text-dark-charcoal transition duration-300 rounded-md mb-1"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-phone inline-block mr-2"
+            >
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-0.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-0.45 12.84 12.84 0 0 0 2.81 0.7A2 2 0 0 1 22 16.92z"
+              />
+            </svg>
+            +91 90088 71144
+          </a>
+          <a
+            href="tel:+919000697275"
+            class="block py-2 px-4 text-white hover:bg-golden-yellow hover:text-dark-charcoal transition duration-300 rounded-md"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-phone inline-block mr-2"
+            >
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-0.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-0.45 12.84 12.84 0 0 0 2.81 0.7A2 2 0 0 1 22 16.92z"
+              />
+            </svg>
+            +91 90006 97275
+          </a>
+          <a
+            href="tel:+919620295544"
+            class="block py-2 px-4 text-white hover:bg-golden-yellow hover:text-dark-charcoal transition duration-300 rounded-md"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-phone inline-block mr-2"
+            >
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-0.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-0.45 12.84 12.84 0 0 0 2.81 0.7A2 2 0 0 1 22 16.92z"
+              />
+            </svg>
+            +91 96202 95544
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Slider Section -->
+    <section
+      id="home"
+      class="relative h-screen flex items-center justify-center text-white text-center overflow-hidden pt-20 md:pt-24"
+    >
+      <!-- Slider Items -->
+      <div
+        class="slider-item active"
+        style="background-image: url('/assets/images/slides/1.jpeg')"
+      ></div>
+      <div
+        class="slider-item"
+        style="background-image: url('/assets/images/slides/2.jpeg')"
+      ></div>
+      <div
+        class="slider-item"
+        style="background-image: url('/assets/images/slides/3.jpeg')"
+      ></div>
+
+      <!-- Overlay for text readability -->
+      <div
+        class="absolute inset-0 slider-overlay flex flex-col justify-center items-center p-4"
+      >
+        <h1
+          class="text-5xl md:text-7xl font-extrabold mb-4 drop-shadow-lg leading-tight animate-on-scroll"
+        >
+          Crafting Unforgettable Moments
+        </h1>
+        <p
+          class="text-xl md:text-2xl mb-8 drop-shadow-md animate-on-scroll delay-100"
+        >
+          Your Dream, Our Expertise. Aravindan Events.
+        </p>
+        <a
+          href="#services"
+          class="bg-golden-yellow text-dark-charcoal px-8 py-4 text-xl font-semibold rounded-full shadow-lg hover:bg-yellow-600 transition duration-300 transform hover:scale-105 animate-on-scroll delay-200"
+          >Explore Our Services</a
+        >
+      </div>
+    </section>
+
+    <!-- Services Section -->
+    <section
+      id="services"
+      class="py-16 md:py-24 bg-dark-charcoal text-gray-200"
+    >
+      <div class="container mx-auto px-6">
+        <h2
+          class="text-4xl md:text-5xl font-bold text-center mb-12 text-golden-yellow animate-on-scroll"
+        >
+          Our Services
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Service Card 1: Wedding Planning -->
+          <div
+            class="bg-gray-800 rounded-xl shadow-lg p-8 text-center border border-gray-700 hover:shadow-xl transition duration-300 transform hover:-translate-y-2 animate-on-scroll delay-100"
+          >
+            <div class="text-golden-yellow text-6xl mb-6">
+              <i class="fas fa-heart"></i>
+            </div>
+            <h3 class="text-2xl font-semibold mb-4 text-white">
+              Wedding Planning
+            </h3>
+            <p class="text-gray-400 leading-relaxed">
+              From intimate ceremonies to grand celebrations, we meticulously
+              plan every detail to make your special day truly magical and
+              stress-free.
+            </p>
+          </div>
+
+          <!-- Service Card 3: Private Parties -->
+          <div
+            class="bg-gray-800 rounded-xl shadow-lg p-8 text-center border border-gray-700 hover:shadow-xl transition duration-300 transform hover:-translate-y-2 animate-on-scroll delay-300"
+          >
+            <div class="text-golden-yellow text-6xl mb-6">
+              <i class="fas fa-champagne-glasses"></i>
+            </div>
+            <h3 class="text-2xl font-semibold mb-4 text-white">
+              Private Parties
+            </h3>
+            <p class="text-gray-400 leading-relaxed">
+              Birthdays, anniversaries, graduations, or any special occasion –
+              we create personalized and memorable celebrations for you and your
+              loved ones.
+            </p>
+          </div>
+          <!-- Service Card 5: Event Design & Decor -->
+          <div
+            class="bg-gray-800 rounded-xl shadow-lg p-8 text-center border border-gray-700 hover:shadow-xl transition duration-300 transform hover:-translate-y-2 animate-on-scroll delay-500"
+          >
+            <div class="text-golden-yellow text-6xl mb-6">
+              <i class="fas fa-palette"></i>
+            </div>
+            <h3 class="text-2xl font-semibold mb-4 text-white">
+              Event Design & Decor
+            </h3>
+            <p class="text-gray-400 leading-relaxed">
+              From conceptualization to execution, we bring your vision to life
+              with stunning decor, lighting, and thematic elements.
+            </p>
+          </div>
+          <!-- Service Card 6: Vendor Management -->
+          <div
+            class="bg-gray-800 rounded-xl shadow-lg p-8 text-center border border-gray-700 hover:shadow-xl transition duration-300 transform hover:-translate-y-2 animate-on-scroll delay-600"
+          >
+            <div class="text-golden-yellow text-6xl mb-6">
+              <i class="fas fa-handshake"></i>
+            </div>
+            <h3 class="text-2xl font-semibold mb-4 text-white">
+              Vendor Management
+            </h3>
+            <p class="text-gray-400 leading-relaxed">
+              We partner with the best vendors in the industry, ensuring
+              top-notch services for catering, photography, entertainment, and
+              more.
+            </p>
+          </div>
+          <!-- Service Card 4: Destination Events -->
+          <div
+            class="bg-gray-800 rounded-xl shadow-lg p-8 text-center border border-gray-700 coming-soon-card animate-on-scroll delay-400"
+          >
+            <div class="text-golden-yellow text-6xl mb-6">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="64"
+                height="64"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-plane mx-auto"
+              >
+                <path
+                  d="M17.8 19.2 16 11l3.5-3.5C21 6 22 5 22 3s-1.5-2-2.5-2c-1.1 0-2 0.5-3.5 2L11 6 2.8 4.2c-.7-.7-1.6-1.2-2.8-1.2H0c0 2.2 2.5 4 2.5 4L2 14l-1.5 1.5c-.7.7-1.2 1.6-1.2 2.8H0c0 2.2 2.5 4 2.5 4L14 22l3.5-3.5c1.5-1.5 2-2.4 2-3.5 0-1.1-0.5-2-2-2.5Z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-semibold mb-4 text-white">
+              Destination Events
+            </h3>
+            <p class="text-gray-400 leading-relaxed">
+              Dreaming of an event in an exotic location? We handle all
+              logistics, ensuring a seamless experience wherever you choose.
+            </p>
+            <div class="coming-soon-overlay">
+              <span class="coming-soon-badge">Coming Soon</span>
+            </div>
+          </div>
+
+          <!-- Service Card 2: Corporate Events -->
+          <div
+            class="bg-gray-800 rounded-xl shadow-lg p-8 text-center border border-gray-700 coming-soon-card animate-on-scroll delay-200"
+          >
+            <div class="text-golden-yellow text-6xl mb-6">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="64"
+                height="64"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-briefcase mx-auto"
+              >
+                <rect width="20" height="14" x="2" y="7" rx="2" ry="2" />
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-semibold mb-4 text-white">
+              Corporate Events
+            </h3>
+            <p class="text-gray-400 leading-relaxed">
+              Conferences, product launches, team-building activities, and galas
+              – we ensure your corporate event reflects your brand's excellence.
+            </p>
+            <div class="coming-soon-overlay">
+              <span class="coming-soon-badge">Coming Soon</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="py-16 md:py-24 bg-gray-900 text-gray-200">
+      <div class="container mx-auto px-6">
+        <h2
+          class="text-4xl md:text-5xl font-bold text-center mb-12 text-golden-yellow animate-on-scroll"
+        >
+          Our Portfolio
+        </h2>
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+        >
+          <!-- Gallery Item 1 -->
+          <div
+            class="relative group rounded-xl overflow-hidden shadow-lg border border-gray-700 animate-on-scroll slide-in-left"
+          >
+            <img
+              src="https://placehold.co/600x400/1A1A1A/E5A83D?text=Wedding+Decor"
+              alt="Wedding Decor"
+              class="w-full h-64 object-cover transform group-hover:scale-105 transition duration-300"
+            />
+            <div
+              class="absolute inset-0 bg-dark-charcoal bg-opacity-70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <p class="text-white text-lg font-semibold">Elegant Wedding</p>
+            </div>
+          </div>
+          <!-- Gallery Item 2 -->
+          <div
+            class="relative group rounded-xl overflow-hidden shadow-lg border border-gray-700 animate-on-scroll slide-in-right delay-100"
+          >
+            <img
+              src="https://placehold.co/600x400/1A1A1A/E5A83D?text=Birthday+Party"
+              alt="Birthday Party"
+              class="w-full h-64 object-cover transform group-hover:scale-105 transition duration-300"
+            />
+            <div
+              class="absolute inset-0 bg-dark-charcoal bg-opacity-70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <p class="text-white text-lg font-semibold">
+                Grand Birthday Gala
+              </p>
+            </div>
+          </div>
+          <!-- Gallery Item 3 -->
+          <div
+            class="relative group rounded-xl overflow-hidden shadow-lg border border-gray-700 animate-on-scroll slide-in-left delay-200"
+          >
+            <img
+              src="https://placehold.co/600x400/1A1A1A/E5A83D?text=Ceremony+Setup"
+              alt="Ceremony Setup"
+              class="w-full h-64 object-cover transform group-hover:scale-105 transition duration-300"
+            />
+            <div
+              class="absolute inset-0 bg-dark-charcoal bg-opacity-70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <p class="text-white text-lg font-semibold">Ceremony Setup</p>
+            </div>
+          </div>
+          <!-- Gallery Item 4 -->
+          <div
+            class="relative group rounded-xl overflow-hidden shadow-lg border border-gray-700 animate-on-scroll slide-in-right delay-300"
+          >
+            <img
+              src="https://placehold.co/600x400/1A1A1A/E5A83D?text=Reception+Hall"
+              alt="Reception Hall"
+              class="w-full h-64 object-cover transform group-hover:scale-105 transition duration-300"
+            />
+            <div
+              class="absolute inset-0 bg-dark-charcoal bg-opacity-70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <p class="text-white text-lg font-semibold">
+                Luxurious Reception
+              </p>
+            </div>
+            <div class="coming-soon-overlay">
+              <span class="coming-soon-badge">Coming Soon</span>
+            </div>
+          </div>
+          <!-- Gallery Item 5 -->
+          <div
+            class="relative group rounded-xl overflow-hidden shadow-lg border border-gray-700 animate-on-scroll slide-in-left delay-400"
+          >
+            <img
+              src="https://placehold.co/600x400/1A1A1A/E5A83D?text=Table+Setting"
+              alt="Table Setting"
+              class="w-full h-64 object-cover transform group-hover:scale-105 transition duration-300"
+            />
+            <div
+              class="absolute inset-0 bg-dark-charcoal bg-opacity-70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <p class="text-white text-lg font-semibold">
+                Exquisite Table Setting
+              </p>
+            </div>
+            <div class="coming-soon-overlay">
+              <span class="coming-soon-badge">Coming Soon</span>
+            </div>
+          </div>
+          <!-- Gallery Item 6 -->
+          <div
+            class="relative group rounded-xl overflow-hidden shadow-lg border border-gray-700 animate-on-scroll slide-in-right delay-500"
+          >
+            <img
+              src="https://placehold.co/600x400/1A1A1A/E5A83D?text=Cake+Design"
+              alt="Cake Design"
+              class="w-full h-64 object-cover transform group-hover:scale-105 transition duration-300"
+            />
+            <div
+              class="absolute inset-0 bg-dark-charcoal bg-opacity-70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <p class="text-white text-lg font-semibold">
+                Stunning Cake Design
+              </p>
+            </div>
+            <div class="coming-soon-overlay">
+              <span class="coming-soon-badge">Coming Soon</span>
+            </div>
+          </div>
+          <!-- Gallery Item 7 -->
+          <div
+            class="relative group rounded-xl overflow-hidden shadow-lg border border-gray-700 animate-on-scroll slide-in-left delay-600"
+          >
+            <img
+              src="https://placehold.co/600x400/1A1A1A/E5A83D?text=Lighting+Setup"
+              alt="Lighting Setup"
+              class="w-full h-64 object-cover transform group-hover:scale-105 transition duration-300"
+            />
+            <div
+              class="absolute inset-0 bg-dark-charcoal bg-opacity-70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <p class="text-white text-lg font-semibold">
+                Atmospheric Lighting
+              </p>
+            </div>
+            <div class="coming-soon-overlay">
+              <span class="coming-soon-badge">Coming Soon</span>
+            </div>
+          </div>
+          <!-- Gallery Item 8 -->
+          <div
+            class="relative group rounded-xl overflow-hidden shadow-lg border border-gray-700 animate-on-scroll slide-in-right delay-700"
+          >
+            <img
+              src="https://placehold.co/600x400/1A1A1A/E5A83D?text=Floral+Arrangement"
+              alt="Floral Arrangement"
+              class="w-full h-64 object-cover transform group-hover:scale-105 transition duration-300"
+            />
+            <div
+              class="absolute inset-0 bg-dark-charcoal bg-opacity-70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <p class="text-white text-lg font-semibold">
+                Grand Floral Arrangements
+              </p>
+            </div>
+            <div class="coming-soon-overlay">
+              <span class="coming-soon-badge">Coming Soon</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team" class="py-16 md:py-24 bg-dark-charcoal text-gray-200">
+      <div class="container mx-auto px-6">
+        <h2
+          class="text-4xl md:text-5xl font-bold text-center mb-12 text-golden-yellow animate-on-scroll"
+        >
+          Meet the Aravindan Team
+        </h2>
+        <!-- <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"> -->
+        <!-- Team Member 1 -->
+        <!-- <div
+            class="bg-gray-800 rounded-xl shadow-lg p-8 text-center border border-gray-700 hover:shadow-xl transition duration-300 transform hover:-translate-y-2 animate-on-scroll delay-100"
+          >
+            <img
+              src="https://placehold.co/150x150/1A1A1A/E5A83D?text=Jane+Doe"
+              alt="Jane Doe"
+              class="w-32 h-32 rounded-full mx-auto mb-6 object-cover border-4 border-golden-yellow"
+            />
+            <h3 class="text-2xl font-semibold mb-2 text-white">Jane Doe</h3>
+            <p class="text-golden-yellow font-medium mb-4">
+              Founder & Lead Planner
+            </p>
+            <p class="text-gray-400 leading-relaxed">
+              With over 15 years of experience, Jane is passionate about
+              bringing unique visions to life, ensuring every event is a
+              masterpiece.
+            </p>
+            <div class="flex justify-center space-x-4 mt-6">
+              <a
+                href="#"
+                class="text-gray-400 hover:text-golden-yellow transition duration-300 text-2xl"
+                ><i class="fab fa-linkedin"></i
+              ></a>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-golden-yellow transition duration-300 text-2xl"
+                ><i class="fab fa-instagram"></i
+              ></a>
+            </div>
+          </div> -->
+        <!-- Team Member 2 -->
+        <!-- <div
+            class="bg-gray-800 rounded-xl shadow-lg p-8 text-center border border-gray-700 hover:shadow-xl transition duration-300 transform hover:-translate-y-2 animate-on-scroll delay-200"
+          >
+            <img
+              src="https://placehold.co/150x150/1A1A1A/E5A83D?text=John+Smith"
+              alt="John Smith"
+              class="w-32 h-32 rounded-full mx-auto mb-6 object-cover border-4 border-golden-yellow"
+            />
+            <h3 class="text-2xl font-semibold mb-2 text-white">John Smith</h3>
+            <p class="text-golden-yellow font-medium mb-4">Creative Director</p>
+            <p class="text-gray-400 leading-relaxed">
+              John's innovative ideas and keen eye for design transform ordinary
+              spaces into extraordinary event venues.
+            </p>
+            <div class="flex justify-center space-x-4 mt-6">
+              <a
+                href="#"
+                class="text-gray-400 hover:text-golden-yellow transition duration-300 text-2xl"
+                ><i class="fab fa-linkedin"></i
+              ></a>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-golden-yellow transition duration-300 text-2xl"
+                ><i class="fab fa-instagram"></i
+              ></a>
+            </div>
+          </div> -->
+        <!-- Team Member 3 -->
+        <!-- <div
+            class="bg-gray-800 rounded-xl shadow-lg p-8 text-center border border-gray-700 hover:shadow-xl transition duration-300 transform hover:-translate-y-2 animate-on-scroll delay-300"
+          >
+            <img
+              src="https://placehold.co/150x150/1A1A1A/E5A83D?text=Sarah+Lee"
+              alt="Sarah Lee"
+              class="w-32 h-32 rounded-full mx-auto mb-6 object-cover border-4 border-golden-yellow"
+            />
+            <h3 class="text-2xl font-semibold mb-2 text-white">Sarah Lee</h3>
+            <p class="text-golden-yellow font-medium mb-4">
+              Logistics Coordinator
+            </p>
+            <p class="text-gray-400 leading-relaxed">
+              Sarah ensures every aspect of your event runs smoothly, from
+              vendor schedules to on-site management.
+            </p>
+            <div class="flex justify-center space-x-4 mt-6">
+              <a
+                href="#"
+                class="text-gray-400 hover:text-golden-yellow transition duration-300 text-2xl"
+                ><i class="fab fa-linkedin"></i
+              ></a>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-golden-yellow transition duration-300 text-2xl"
+                ><i class="fab fa-instagram"></i
+              ></a>
+            </div>
+          </div>
+        </div> -->
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 md:py-24 bg-gray-900 text-gray-200">
+      <div class="container mx-auto px-6">
+        <h2
+          class="text-4xl md:text-5xl font-bold text-center mb-12 text-golden-yellow animate-on-scroll"
+        >
+          Let's Plan Your Next Event
+        </h2>
+        <div class="flex flex-col lg:flex-row gap-12 items-center">
+          <!-- Contact Form -->
+          <div
+            class="lg:w-1/2 w-full bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-700 animate-on-scroll slide-in-left"
+          >
+            <h3 class="text-3xl font-semibold mb-6 text-white">
+              Send Us a Message
+            </h3>
+            <form class="space-y-6">
+              <div>
+                <label
+                  for="name"
+                  class="block text-gray-300 text-lg font-medium mb-2"
+                  >Name</label
+                >
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  class="w-full p-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-golden-yellow focus:border-transparent transition duration-200"
+                  placeholder="Your Name"
+                  required
+                />
+              </div>
+              <div>
+                <label
+                  for="email"
+                  class="block text-gray-300 text-lg font-medium mb-2"
+                  >Email</label
+                >
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  class="w-full p-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-golden-yellow focus:border-transparent transition duration-200"
+                  placeholder="your.email@example.com"
+                  required
+                />
+              </div>
+              <div>
+                <label
+                  for="phone"
+                  class="block text-gray-300 text-lg font-medium mb-2"
+                  >Phone
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  class="w-full p-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-golden-yellow focus:border-transparent transition duration-200"
+                  placeholder="+1 (123) 456-7890"
+                />
+              </div>
+              <div>
+                <label
+                  for="event_type"
+                  class="block text-gray-300 text-lg font-medium mb-2"
+                  >Type of Event</label
+                >
+                <select
+                  id="event_type"
+                  name="event_type"
+                  class="w-full p-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-golden-yellow focus:border-transparent transition duration-200"
+                  required
+                >
+                  <option value="">Select Event Type</option>
+                  <option value="wedding">Wedding</option>
+                  <option value="corporate">Corporate Event</option>
+                  <option value="private_party">Private Party</option>
+                  <option value="destination">Destination Event</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label
+                  for="message"
+                  class="block text-gray-300 text-lg font-medium mb-2"
+                  >Message</label
+                >
+                <textarea
+                  id="message"
+                  name="message"
+                  rows="5"
+                  class="w-full p-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-golden-yellow focus:border-transparent transition duration-200"
+                  placeholder="Tell us about your event..."
+                  required
+                ></textarea>
+              </div>
+              <!-- New WhatsApp and Email buttons -->
+              <button
+                type="button"
+                id="whatsapp-send-btn"
+                class="w-full flex items-center justify-center bg-green-500 text-white px-6 py-3 text-lg font-semibold rounded-lg shadow-md hover:bg-green-600 transition duration-300 transform hover:scale-105 mb-4"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-whatsapp mr-2"
+                >
+                  <path
+                    d="M17.4 17.4V14.5A5.5 5.5 0 0 0 12 9V7A5.5 5.5 0 0 0 6.5 12V14.5L4 17.5 7 20.5 9.5 18 12 20.5 14.5 18 17 20.5 20.5 17.5 17.4 17.4Z"
+                    stroke="none"
+                    fill="currentColor"
+                  />
+                </svg>
+                Send to WhatsApp
+              </button>
+              <button
+                type="button"
+                id="email-send-btn"
+                class="w-full flex items-center justify-center bg-blue-600 text-white px-6 py-3 text-lg font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300 transform hover:scale-105"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-mail mr-2"
+                >
+                  <rect width="20" height="16" x="2" y="4" rx="2" />
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                </svg>
+                Send Email
+              </button>
+            </form>
+          </div>
+
+          <!-- Contact Information & Map -->
+          <div class="lg:w-1/2 w-full space-y-8">
+            <div
+              class="bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-700 animate-on-scroll slide-in-right delay-100"
+            >
+              <h3 class="text-3xl font-semibold mb-6 text-white">
+                Contact Information
+              </h3>
+              <p class="flex items-center text-gray-300 text-lg mb-4">
+                <i
+                  class="fas fa-map-marker-alt text-golden-yellow mr-4 text-2xl"
+                ></i>
+                Nikoo Home 2, Bhartiya City, Thanisandra Main Road, Bengaluru,
+                Karnataka 560064
+              </p>
+              <p class="flex items-center text-gray-300 text-lg mb-4">
+                <i class="fas fa-phone text-golden-yellow mr-4 text-2xl"></i>
+                <span>+91 9071118197 | +91 90088 71144 </span>
+              </p>
+              <p class="flex items-center text-gray-300 text-lg mb-4">
+                <i class="fas fa-envelope text-golden-yellow mr-4 text-2xl"></i>
+                info@Aravindanevents.com
+              </p>
+              <div class="flex space-x-6 mt-8 justify-center">
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-golden-yellow transition duration-300 text-4xl"
+                  ><i class="fab fa-facebook-square"></i
+                ></a>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-golden-yellow transition duration-300 text-4xl"
+                  ><i class="fab fa-instagram-square"></i
+                ></a>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-golden-yellow transition duration-300 text-4xl"
+                  ><i class="fab fa-pinterest-square"></i
+                ></a>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-golden-yellow transition duration-300 text-4xl"
+                  ><i class="fab fa-twitter-square"></i
+                ></a>
+              </div>
+            </div>
+            <!-- Google Map Embed -->
+            <div
+              class="bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-700 animate-on-scroll slide-in-left delay-200"
+            >
+              <h3 class="text-3xl font-semibold p-8 pb-0 text-white">
+                Find Us
+              </h3>
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3886.286767188755!2d77.63800997507836!3d13.081003387244497!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae19932d2c5769%3A0x4b8f0a394b42030e!2sNikoo%20Homes%202!5e0!3m2!1sen!2sin!4v1752922343884!5m2!1sen!2sin"
+                width="100%"
+                height="450"
+                style="border: 0"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark-charcoal text-gray-400 py-12">
+      <div class="container mx-auto px-6 text-center">
+        <div
+          class="flex flex-col md:flex-row items-center justify-between mb-8"
+        >
+          <div class="flex items-center">
+            <img
+              src="assets/images/logo-transparent.png"
+              alt="Aravindan Events Logo"
+              class="h-16 w-auto rounded-full mr-3 border-2 border-golden-yellow p-0.5"
+            />
+            <a href="#home" class="text-3xl font-bold tracking-wide"
+              >Aravindan <span class="text-golden-yellow">Events</span></a
+            >
+          </div>
+
+          <div class="flex flex-wrap justify-center md:justify-end space-x-6">
+            <a
+              href="#home"
+              class="hover:text-golden-yellow transition duration-300"
+              >Home</a
+            >
+            <a
+              href="#services"
+              class="hover:text-golden-yellow transition duration-300"
+              >Services</a
+            >
+            <a
+              href="#gallery"
+              class="hover:text-golden-yellow transition duration-300"
+              >Gallery</a
+            >
+            <a
+              href="#team"
+              class="hover:text-golden-yellow transition duration-300"
+              >Team</a
+            >
+            <a
+              href="#contact"
+              class="hover:text-golden-yellow transition duration-300"
+              >Contact</a
+            >
+          </div>
+        </div>
+        <p class="text-gray-500">
+          &copy; 2025 Aravindan Events. All Rights Reserved.
+        </p>
+        <p class="text-gray-500 mt-2">
+          <a href="#" class="hover:text-golden-yellow transition duration-300"
+            >Privacy Policy</a
+          >
+          |
+          <a href="#" class="hover:text-golden-yellow transition duration-300"
+            >Terms of Service</a
+          >
+        </p>
+      </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button
+      id="scrollToTopBtn"
+      class="bg-golden-yellow text-dark-charcoal hover:bg-yellow-600"
+    >
+      <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+      // Smooth scrolling for navigation links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          document.querySelector(this.getAttribute("href")).scrollIntoView({
+            behavior: "smooth"
+          });
+          // Close mobile menu if open
+          if (mobileMenu.classList.contains("flex")) {
+            mobileMenu.classList.remove("flex");
+            mobileMenu.classList.add("hidden");
+          }
+        });
+      });
+
+      // Mobile menu toggle
+      const mobileMenuButton = document.getElementById("mobile-menu-button");
+      const mobileMenu = document.getElementById("mobile-menu");
+
+      mobileMenuButton.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+        mobileMenu.classList.toggle("flex");
+        mobileMenu.classList.toggle("flex-col");
+      });
+
+      // Scroll to top button logic
+      const scrollToTopBtn = document.getElementById("scrollToTopBtn");
+
+      window.onscroll = function () {
+        if (
+          document.body.scrollTop > 200 ||
+          document.documentElement.scrollTop > 200
+        ) {
+          scrollToTopBtn.style.display = "block";
+        } else {
+          scrollToTopBtn.style.display = "none";
+        }
+      };
+
+      scrollToTopBtn.addEventListener("click", function () {
+        document.body.scrollTop = 0; // For Safari
+        document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+      });
+
+      // Simple Slider Logic
+      let slideIndex = 0;
+      const slides = document.querySelectorAll(".slider-item");
+
+      function showSlides() {
+        for (let i = 0; i < slides.length; i++) {
+          slides[i].classList.remove("active");
+        }
+        slideIndex++;
+        if (slideIndex > slides.length) {
+          slideIndex = 1;
+        }
+        slides[slideIndex - 1].classList.add("active");
+        setTimeout(showSlides, 5000); // Change image every 5 seconds
+      }
+
+      // Intersection Observer for scroll animations
+      const animateElements = document.querySelectorAll(
+        ".animate-on-scroll, .slide-in-left, .slide-in-right"
+      );
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-visible");
+              // Stop observing once visible to prevent re-triggering
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        {
+          threshold: 0.2, // Trigger when 20% of the element is visible
+          rootMargin: "0px 0px -50px 0px" // Adjust to trigger a bit earlier
+        }
+      );
+
+      animateElements.forEach((element) => {
+        observer.observe(element);
+      });
+
+      // Contact Form Submission Logic
+      const whatsappSendBtn = document.getElementById("whatsapp-send-btn");
+      const emailSendBtn = document.getElementById("email-send-btn");
+      const nameInput = document.getElementById("name");
+      const emailInput = document.getElementById("email");
+      const phoneInput = document.getElementById("phone");
+      const eventTypeSelect = document.getElementById("event_type");
+      const messageTextarea = document.getElementById("message");
+
+      whatsappSendBtn.addEventListener("click", () => {
+        const name = nameInput.value;
+        const email = emailInput.value;
+        const phone = phoneInput.value;
+        const eventType = eventTypeSelect.value;
+        const message = messageTextarea.value;
+
+        let whatsappMessage = `Hello Aravindan Events Team,\n\n`;
+        whatsappMessage += `I would like to inquire about event planning services.\n\n`;
+        whatsappMessage += `My details are:\n`;
+        whatsappMessage += `Name: ${name || "N/A"}\n`;
+        whatsappMessage += `Email: ${email || "N/A"}\n`;
+        if (phone) {
+          whatsappMessage += `Phone: ${phone}\n`;
+        }
+        whatsappMessage += `Event Type: ${eventType || "N/A"}\n`;
+        whatsappMessage += `Message: ${message || "No message provided."}\n\n`;
+        whatsappMessage += `Looking forward to your response!`;
+
+        const encodedMessage = encodeURIComponent(whatsappMessage);
+        // IMPORTANT: Replace with your actual WhatsApp number, including country code (e.g., +91 for India)
+        const whatsappNumber = "+919008871144";
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+
+        window.open(whatsappUrl, "_blank");
+      });
+
+      emailSendBtn.addEventListener("click", () => {
+        const name = nameInput.value;
+        const email = emailInput.value;
+        const phone = phoneInput.value;
+        const eventType = eventTypeSelect.value;
+        const message = messageTextarea.value;
+
+        const subject = encodeURIComponent(
+          `Event Planning Inquiry from ${name}`
+        );
+        let body = `Dear Aravindan Events Team,\n\n`;
+        body += `I am writing to inquire about your event planning services.\n\n`;
+        body += `Here are my details:\n`;
+        body += `Name: ${name || "N/A"}\n`;
+        body += `Email: ${email || "N/A"}\n`;
+        if (phone) {
+          body += `Phone: ${phone}\n`;
+        }
+        body += `Event Type: ${eventType || "N/A"}\n`;
+        body += `Message: ${message || "No message provided."}\n\n`;
+        body += `Please get in touch with me at your earliest convenience.`;
+
+        const encodedBody = encodeURIComponent(body);
+        // IMPORTANT: Replace with your actual recipient email address
+        const recipientEmail = "info@Aravindanevents.com";
+        const mailtoUrl = `mailto:${recipientEmail}?subject=${subject}&body=${encodedBody}`;
+
+        window.location.href = mailtoUrl;
+      });
+
+      // Loading overlay logic
+      window.addEventListener("load", () => {
+        const loadingOverlay = document.getElementById("loading-overlay");
+        setTimeout(() => {
+          loadingOverlay.classList.add("hidden"); // Start fade out
+          // Optionally remove from DOM after transition if needed for performance
+          // setTimeout(() => loadingOverlay.remove(), 500); // 500ms is the transition duration
+        }, 2000); // Hide after 5 seconds
+      });
+
+      // Start slider when the window loads
+      window.onload = function () {
+        showSlides();
+      };
+    </script>
+  </body>
+</html>
