@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SimpleAR.js - Video AR</title>
+    <!-- Use a simple font via CDN -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js for 3D rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Three.js for video texture -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/Three.js"></script>
+    <!-- JS-Aruco for marker detection and pose estimation -->
+    <script src="https://unpkg.com/@web-ar/js-aruco/build/aruco.js"></script>
+
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #1a202c;
+        color: #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        padding: 1rem;
+        overflow: hidden;
+      }
+      #ar-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        max-width: 800px;
+        max-height: 600px;
+      }
+      #video-feed {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 1;
+      }
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+      }
+      #ui-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="ar-container"
+      class="relative w-full h-full max-w-4xl rounded-xl overflow-hidden shadow-2xl"
+    >
+      <!-- The video feed from the webcam -->
+      <video id="video-feed" autoplay playsinline></video>
+      <!-- The Three.js canvas overlay -->
+      <canvas id="ar-canvas"></canvas>
+      <!-- The UI overlay to show instructions and a start button -->
+      <div
+        id="ui-overlay"
+        class="bg-gray-800 bg-opacity-75 p-6 rounded-xl flex flex-col items-center space-y-4 text-center"
+      >
+        <h1 class="text-3xl font-bold">Welcome to Aravindan AR world</h1>
+        <p class="text-gray-300">
+          Please place the camera on AR marker. When the camera detects the
+          marker. you will experience the Aravindan AR world
+        </p>
+        <button
+          id="startButton"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
+        >
+          Start
+        </button>
+        <div
+          id="messageBox"
+          class="text-red-400 font-semibold mt-2 hidden"
+        ></div>
+      </div>
+    </div>
+
+    <script>
+      // Use an IIFE (Immediately Invoked Function Expression) to avoid global namespace pollution
+      (function () {
+        /**
+         * The SimpleAR library provides a basic framework for marker-based augmented reality.
+         * It handles webcam access, ARUco marker detection, and a simple Three.js scene.
+         */
+        class SimpleAR {
+          constructor() {
+            // Core AR elements
+            this.video = document.getElementById("video-feed");
+            this.canvas = document.getElementById("ar-canvas");
+            this.messageBox = document.getElementById("messageBox");
+            this.uiOverlay = document.getElementById("ui-overlay");
+
+            // Three.js scene components
+            this.scene = null;
+            this.renderer = null;
+            this.camera = null;
+            this.videoElement = null;
+            this.videoTexture = null;
+            this.videoPlane = null;
+            this.isInitialized = false;
+            this.isLooping = false;
+            this.youtubeVideoId = "sB-B-1z-2kE"; // Example YouTube video ID (Big Buck Bunny)
+
+            // ARUco marker detection
+            this.detector = null;
+            this.markerSize = 80; // Size of the marker in millimeters
+            this.markerId = 0; // The ID of the marker we are looking for
+          }
+
+          /**
+           * Initializes the AR system by requesting camera access and setting up Three.js.
+           */
+          async init() {
+            try {
+              // Request access to the user's webcam
+              const stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                  facingMode: "environment" // Prefer the rear camera on mobile
+                }
+              });
+              this.video.srcObject = stream;
+
+              // Wait for the video to load
+              await new Promise((resolve) => {
+                this.video.onloadedmetadata = () => resolve();
+              });
+
+              // Set canvas dimensions to match the video feed
+              this.canvas.width = this.video.videoWidth;
+              this.canvas.height = this.video.videoHeight;
+              this.video.play();
+
+              // Setup the Three.js scene, camera, and video plane
+              this.setupScene();
+
+              // Initialize the ARUco detector
+              this.detector = new AR.Detector();
+
+              this.isInitialized = true;
+              this.hideUI();
+              this.startLoop();
+            } catch (error) {
+              this.showError(
+                "Could not access your webcam. Please check your permissions."
+              );
+              console.error("Initialization failed:", error);
+            }
+          }
+
+          /**
+           * Sets up the basic Three.js scene, renderer, and camera.
+           */
+          setupScene() {
+            // Create a new Three.js scene
+            this.scene = new THREE.Scene();
+
+            // Create a WebGL renderer and attach it to the canvas
+            this.renderer = new THREE.WebGLRenderer({
+              antialias: true,
+              canvas: this.canvas,
+              alpha: true // Transparent background so we can see the video
+            });
+            this.renderer.setSize(this.canvas.width, this.canvas.height);
+
+            // Create a perspective camera. The FOV and aspect are set to match the video.
+            this.camera = new THREE.PerspectiveCamera(
+              50,
+              this.canvas.width / this.canvas.height,
+              0.1,
+              1000
+            );
+
+            // The camera's position is managed by the marker detection
+            this.scene.add(this.camera);
+
+            // Create a hidden video element to hold the YouTube video
+            this.videoElement = document.createElement("video");
+            this.videoElement.id = "H73xzo0F2Ks";
+            this.videoElement.autoplay = true;
+            this.videoElement.loop = true;
+            this.videoElement.crossOrigin = "anonymous";
+            this.videoElement.style.display = "none";
+            // The video URL must point to a video that allows cross-origin requests.
+            // This is a common issue with YouTube. The best solution is to
+            // host the video yourself or use a service that provides direct links.
+            // For this example, we'll use a direct MP4 link.
+            this.videoElement.src = `assets/videos/promotional_video.mp4`;
+
+            // Create a Three.js video texture from the video element
+            this.videoTexture = new THREE.VideoTexture(this.videoElement);
+            this.videoTexture.minFilter = THREE.LinearFilter;
+            this.videoTexture.magFilter = THREE.LinearFilter;
+            this.videoTexture.format = THREE.RGBAFormat;
+
+            // Create a plane to display the video texture
+            const videoWidth = 640;
+            const videoHeight = 360;
+            const aspectRatio = videoWidth / videoHeight;
+            const planeGeometry = new THREE.PlaneGeometry(
+              this.markerSize,
+              this.markerSize / aspectRatio
+            );
+            const planeMaterial = new THREE.MeshBasicMaterial({
+              map: this.videoTexture
+            });
+            this.videoPlane = new THREE.Mesh(planeGeometry, planeMaterial);
+
+            // Add the video plane to the scene
+            this.scene.add(this.videoPlane);
+          }
+
+          /**
+           * The main animation loop that runs continuously to detect markers and render the scene.
+           */
+          startLoop() {
+            if (this.isLooping) return;
+            this.isLooping = true;
+
+            const animate = () => {
+              if (!this.isLooping) return;
+              requestAnimationFrame(animate);
+
+              this.update();
+              this.render();
+            };
+            animate();
+          }
+
+          /**
+           * Updates the state of the AR scene.
+           * This is where the core logic of marker detection happens.
+           */
+          update() {
+            // Create a temporary canvas to get a still image of the video
+            const videoCanvas = document.createElement("canvas");
+            const context = videoCanvas.getContext("2d");
+            videoCanvas.width = this.video.videoWidth;
+            videoCanvas.height = this.video.videoHeight;
+            context.drawImage(
+              this.video,
+              0,
+              0,
+              videoCanvas.width,
+              videoCanvas.height
+            );
+
+            // Detect markers in the image data
+            const markers = this.detector.detect(
+              context.getImageData(0, 0, videoCanvas.width, videoCanvas.height)
+            );
+
+            // Look for our specific marker
+            const foundMarker = markers.find(
+              (marker) => marker.id === this.markerId
+            );
+
+            if (foundMarker) {
+              // The ARUco library provides a built-in pose matrix.
+              // We convert the marker's pose matrix into a Three.js matrix.
+              const markerMatrix = new THREE.Matrix4();
+              markerMatrix.fromArray(foundMarker.pose.matrix);
+
+              // Position the video plane on top of the marker.
+              this.videoPlane.matrix.copy(markerMatrix);
+              this.videoPlane.matrix.decompose(
+                this.videoPlane.position,
+                this.videoPlane.quaternion,
+                this.videoPlane.scale
+              );
+
+              // Make the video plane visible and start the video
+              this.videoPlane.visible = true;
+              if (this.videoElement.paused) {
+                this.videoElement.play();
+              }
+            } else {
+              // If the marker is not found, hide the video plane and pause the video
+              this.videoPlane.visible = false;
+              if (!this.videoElement.paused) {
+                this.videoElement.pause();
+              }
+            }
+          }
+
+          /**
+           * Renders the Three.js scene.
+           */
+          render() {
+            // Render the scene
+            this.renderer.render(this.scene, this.camera);
+          }
+
+          /**
+           * Hides the initial UI overlay.
+           */
+          hideUI() {
+            this.uiOverlay.style.display = "none";
+          }
+
+          /**
+           * Shows an error message in the UI.
+           * @param {string} message - The message to display.
+           */
+          showError(message) {
+            this.uiOverlay.style.display = "flex";
+            this.messageBox.textContent = message;
+            this.messageBox.style.display = "block";
+          }
+        }
+
+        // --- Main Application Logic ---
+
+        // Create an instance of the library
+        const arApp = new SimpleAR();
+
+        // Event listener for the start button
+        const startButton = document.getElementById("startButton");
+        if (startButton) {
+          startButton.addEventListener("click", () => {
+            arApp.init();
+          });
+        }
+
+        // Optional: Handle window resize to keep the canvas in sync
+        window.addEventListener("resize", () => {
+          const video = document.getElementById("video-feed");
+          const canvas = document.getElementById("ar-canvas");
+          if (arApp.isInitialized) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            arApp.renderer.setSize(canvas.width, canvas.height);
+            arApp.camera.aspect = canvas.width / canvas.height;
+            arApp.camera.updateProjectionMatrix();
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
