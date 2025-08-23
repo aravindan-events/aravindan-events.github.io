@@ -61,13 +61,6 @@
         height: 100%;
         z-index: 2;
       }
-      #ui-overlay {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 10;
-      }
     </style>
   </head>
   <body>
@@ -79,28 +72,6 @@
       <video id="video-feed" autoplay playsinline></video>
       <!-- The Three.js canvas overlay -->
       <canvas id="ar-canvas"></canvas>
-      <!-- The UI overlay to show instructions and a start button -->
-      <div
-        id="ui-overlay"
-        class="bg-gray-800 bg-opacity-75 p-6 rounded-xl flex flex-col items-center space-y-4 text-center"
-      >
-        <h1 class="text-3xl font-bold">Simple AR</h1>
-        <p class="text-gray-300">
-          Please prepare the AR marker: a QR code that links to this page,
-          combined with the Aruco marker. When the camera detects the marker, a
-          video will play.
-        </p>
-        <button
-          id="startButton"
-          class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
-        >
-          Start AR
-        </button>
-        <div
-          id="messageBox"
-          class="text-red-400 font-semibold mt-2 hidden"
-        ></div>
-      </div>
     </div>
 
     <script>
@@ -115,8 +86,6 @@
             // Core AR elements
             this.video = document.getElementById("video-feed");
             this.canvas = document.getElementById("ar-canvas");
-            this.messageBox = document.getElementById("messageBox");
-            this.uiOverlay = document.getElementById("ui-overlay");
 
             // Three.js scene components
             this.scene = null;
@@ -125,7 +94,6 @@
             this.videoElement = null;
             this.videoTexture = null;
             this.videoPlane = null;
-            this.debugCube = null; // A cube for debugging
             this.isInitialized = false;
             this.isLooping = false;
             this.videoFileUrl = `https://ar.js.org/three.js/examples/assets/video/gearvr.mp4`; // A direct URL to an MP4 video file
@@ -166,12 +134,8 @@
               this.detector = new AR.Detector();
 
               this.isInitialized = true;
-              this.hideUI();
               this.startLoop();
             } catch (error) {
-              this.showError(
-                "Could not access your webcam. Please check your permissions."
-              );
               console.error("Initialization failed:", error);
             }
           }
@@ -232,19 +196,6 @@
 
             // Add the video plane to the scene
             this.scene.add(this.videoPlane);
-
-            // Add a simple cube for debugging purposes
-            const cubeGeometry = new THREE.BoxGeometry(
-              this.markerSize,
-              this.markerSize,
-              this.markerSize
-            );
-            const cubeMaterial = new THREE.MeshBasicMaterial({
-              color: 0x00ff00
-            });
-            this.debugCube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-            this.debugCube.position.set(0, 0, -200); // Position it in front of the camera
-            this.scene.add(this.debugCube);
           }
 
           /**
@@ -327,23 +278,6 @@
             // Render the scene
             this.renderer.render(this.scene, this.camera);
           }
-
-          /**
-           * Hides the initial UI overlay.
-           */
-          hideUI() {
-            this.uiOverlay.style.display = "none";
-          }
-
-          /**
-           * Shows an error message in the UI.
-           * @param {string} message - The message to display.
-           */
-          showError(message) {
-            this.uiOverlay.style.display = "flex";
-            this.messageBox.textContent = message;
-            this.messageBox.style.display = "block";
-          }
         }
 
         // --- Main Application Logic ---
@@ -351,13 +285,10 @@
         // Create an instance of the library
         const arApp = new SimpleAR();
 
-        // Event listener for the start button
-        const startButton = document.getElementById("startButton");
-        if (startButton) {
-          startButton.addEventListener("click", () => {
-            arApp.init();
-          });
-        }
+        // The AR experience starts automatically when the page loads
+        window.onload = function () {
+          arApp.init();
+        };
 
         // Optional: Handle window resize to keep the canvas in sync
         window.addEventListener("resize", () => {
