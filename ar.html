@@ -93,7 +93,7 @@
           id="startButton"
           class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
         >
-          Start
+          Start AR
         </button>
         <div
           id="messageBox"
@@ -126,11 +126,11 @@
             this.videoPlane = null;
             this.isInitialized = false;
             this.isLooping = false;
-            this.youtubeVideoId = "sB-B-1z-2kE"; // Example YouTube video ID (Big Buck Bunny)
+            this.videoFileUrl = `assets/videos/promotional_video.mp4`; // A direct URL to an MP4 video file
 
             // ARUco marker detection
             this.detector = null;
-            this.markerSize = 80; // Size of the marker in millimeters
+            this.markerSize = 20; // Size of the marker in millimeters
             this.markerId = 0; // The ID of the marker we are looking for
           }
 
@@ -200,18 +200,14 @@
             // The camera's position is managed by the marker detection
             this.scene.add(this.camera);
 
-            // Create a hidden video element to hold the YouTube video
+            // Create a hidden video element to hold the video
             this.videoElement = document.createElement("video");
-            this.videoElement.id = "H73xzo0F2Ks";
+            this.videoElement.id = "ar-video";
             this.videoElement.autoplay = true;
             this.videoElement.loop = true;
             this.videoElement.crossOrigin = "anonymous";
             this.videoElement.style.display = "none";
-            // The video URL must point to a video that allows cross-origin requests.
-            // This is a common issue with YouTube. The best solution is to
-            // host the video yourself or use a service that provides direct links.
-            // For this example, we'll use a direct MP4 link.
-            this.videoElement.src = `assets/videos/promotional_video.mp4`;
+            this.videoElement.src = this.videoFileUrl;
 
             // Create a Three.js video texture from the video element
             this.videoTexture = new THREE.VideoTexture(this.videoElement);
