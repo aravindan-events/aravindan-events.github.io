@@ -94,6 +94,7 @@
             this.videoElement = null;
             this.videoTexture = null;
             this.videoPlane = null;
+            this.debugCube = null; // A cube for debugging
             this.isInitialized = false;
             this.isLooping = false;
             this.videoFileUrl = `https://ar.js.org/three.js/examples/assets/video/gearvr.mp4`; // A direct URL to an MP4 video file
@@ -117,9 +118,13 @@
               });
               this.video.srcObject = stream;
 
-              // Wait for the video to load
+              // Wait for the video to load and have dimensions
               await new Promise((resolve) => {
-                this.video.onloadedmetadata = () => resolve();
+                if (this.video.readyState >= 2) {
+                  resolve();
+                } else {
+                  this.video.onloadedmetadata = () => resolve();
+                }
               });
 
               // Set canvas dimensions to match the video feed
@@ -196,6 +201,20 @@
 
             // Add the video plane to the scene
             this.scene.add(this.videoPlane);
+
+            // Add a simple cube for debugging purposes
+            const cubeSize = this.markerSize * 0.75;
+            const cubeGeometry = new THREE.BoxGeometry(
+              cubeSize,
+              cubeSize,
+              cubeSize
+            );
+            const cubeMaterial = new THREE.MeshBasicMaterial({
+              color: 0x00ff00
+            });
+            this.debugCube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+            this.debugCube.position.set(0, 0, -100); // Position it in front of the camera
+            this.scene.add(this.debugCube);
           }
 
           /**
