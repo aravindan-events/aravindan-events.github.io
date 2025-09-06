@@ -65,7 +65,7 @@
       var models = [
         {
           url: "../models/rigged_t-rex_fabulous/scene.gltf",
-          scale: "0.5 0.5 0.5",
+          scale: "3 3 3",
           info: "Magnemite, Lv. 5, HP 10/10",
           location: {
             lat: 13.08128,
@@ -74,7 +74,7 @@
         },
         {
           url: "../models/rigged_t-rex_fabulous/scene.gltf",
-          scale: "0.2 0.2 0.2",
+          scale: "1 1 1",
           info: "Articuno, Lv. 80, HP 100/100",
           location: {
             lat: 13.08129,
@@ -83,7 +83,7 @@
         },
         {
           url: "../models/rigged_t-rex_fabulous/scene.gltf",
-          scale: "0.08 0.08 0.08",
+          scale: "0.5 0.5 0.5",
           info: "Dragonite, Lv. 99, HP 150/150",
           location: {
             lat: 13.081348,
@@ -107,6 +107,8 @@
         entity.setAttribute("gltf-model", model.url);
         if (model.scale) entity.setAttribute("scale", model.scale);
         if (model.rotation) entity.setAttribute("rotation", model.rotation);
+        // Re-add the animation-mixer component to enable animations
+        entity.setAttribute("animation-mixer", "");
       };
 
       // Function to calculate distance between two lat/lng points
@@ -160,7 +162,7 @@
               }
 
               if (distance <= 5 && !loadedModels.has(model.url)) {
-                logToUI(`Model is within 2m, loading: ${model.info}`);
+                logToUI(`Model is within 5m, loading: ${model.info}`);
                 let modelEntity = document.createElement("a-entity");
                 modelEntity.setAttribute(
                   "gps-entity-place",
@@ -186,7 +188,7 @@
               distanceDisplay.textContent = `${minDistance.toFixed(2)}m from ${
                 nearestModel.info.split(",")[0]
               }`;
-              if (minDistance <= 2) {
+              if (minDistance <= 5) {
                 distanceDisplay.textContent = `Loading model...`;
               }
             } else {
