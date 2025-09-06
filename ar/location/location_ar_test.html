@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>AR.js Location-based Model</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+      #info-panel {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 10px;
+        border-radius: 5px;
+        font-family: sans-serif;
+        z-index: 100;
+      }
+      #log-panel {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        width: calc(100% - 20px);
+        max-height: 150px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        font-family: monospace;
+        font-size: 12px;
+        overflow-y: scroll;
+        z-index: 100;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="info-panel">
+      <p>Current Lat: <span id="lat-display">...</span></p>
+      <p>Current Lng: <span id="lng-display">...</span></p>
+      <p>Distance to nearest model: <span id="distance-display">...</span></p>
+    </div>
+
+    <div id="log-panel">
+      <p>AR.js Log:</p>
+    </div>
+
+    <a-scene
+      vr-mode-ui="enabled: false"
+      arjs="sourceType: webcam; debugUIEnabled: false;"
+      renderer="logarithmicDepthBuffer: true;"
+    >
+      <a-camera
+        gps-camera="minDistance: 1; maxDistance: 1000;"
+        rotation-reader
+      ></a-camera>
+    </a-scene>
+
+    <script>
+      // Define the models and their locations
+      var models = [
+        {
+          url: "../models/rigged_t-rex_fabulous/scene.gltf",
+          scale: "0.5 0.5 0.5",
+          info: "Magnemite, Lv. 5, HP 10/10",
+          location: {
+            lat: 13.081582,
+            lng: 77.63908
+          }
+        },
+        {
+          url: "../models/rigged_t-rex_fabulous/scene.gltf",
+          scale: "0.2 0.2 0.2",
+          info: "Articuno, Lv. 80, HP 100/100",
+          location: {
+            lat: 13.081582,
+            lng: 77.63908
+          }
+        },
+        {
+          url: "../models/rigged_t-rex_fabulous/scene.gltf",
+          scale: "0.08 0.08 0.08",
+          info: "Dragonite, Lv. 99, HP 150/150",
+          location: {
+            lat: 13.081582,
+            lng: 77.63908
+          }
+        }
+      ];
+
+      // Custom function to log messages to the UI panel and the console
+      function logToUI(message) {
+        const logPanel = document.getElementById("log-panel");
+        const p = document.createElement("p");
+        p.textContent = `> ${message}`;
+        logPanel.appendChild(p);
+        logPanel.scrollTop = logPanel.scrollHeight; // Auto-scroll to the bottom
+        console.log(message); // Keep this for debugging on desktop
+      }
+
+      // Function to set model attributes
+      var setModel = function (model, entity) {
+        entity.setAttribute("gltf-model", model.url);
+        if (model.scale) entity.setAttribute("scale", model.scale);
+        if (model.rotation) entity.setAttribute("rotation", model.rotation);
+      };
+
+      // Function to calculate distance between two lat/lng points
+      function getDistance(userLat, userLng, modelLat, modelLng) {
+        const R = 6371e3; // metres
+        const φ1 = (userLat * Math.PI) / 180;
+        const φ2 = (modelLat * Math.PI) / 180;
+        const Δφ = ((modelLat - userLat) * Math.PI) / 180;
+        const Δλ = ((modelLng - userLng) * Math.PI) / 180;
+
+        const a =
+          Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+          Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        const d = R * c; // in metres
+        return d;
+      }
+
+      // Watch user's location and update display
+      function updateLocationAndModels() {
+        const latDisplay = document.getElementById("lat-display");
+        const lngDisplay = document.getElementById("lng-display");
+        const distanceDisplay = document.getElementById("distance-display");
+        const scene = document.querySelector("a-scene");
+        const loadedModels = new Set(); // Keep track of loaded models
+
+        navigator.geolocation.watchPosition(
+          (position) => {
+            const userLat = position.coords.latitude;
+            const userLng = position.coords.longitude;
+
+            // Update the main info panel
+            latDisplay.textContent = userLat.toFixed(6);
+            lngDisplay.textContent = userLng.toFixed(6);
+
+            let minDistance = Infinity;
+            let nearestModel = null;
+
+            models.forEach((model) => {
+              const distance = getDistance(
+                userLat,
+                userLng,
+                model.location.lat,
+                model.location.lng
+              );
+
+              if (distance < minDistance) {
+                minDistance = distance;
+                nearestModel = model;
+              }
+
+              if (distance <= 2 && !loadedModels.has(model.url)) {
+                logToUI(`Model is within 2m, loading: ${model.info}`);
+                let modelEntity = document.createElement("a-entity");
+                modelEntity.setAttribute(
+                  "gps-entity-place",
+                  `latitude: ${model.location.lat}; longitude: ${model.location.lng};`
+                );
+                setModel(model, modelEntity);
+                scene.appendChild(modelEntity);
+                loadedModels.add(model.url);
+              } else if (distance > 2 && loadedModels.has(model.url)) {
+                logToUI(`User moved away, removing model: ${model.info}`);
+                const entity = document.querySelector(
+                  `[gltf-model="${model.url}"]`
+                );
+                if (entity) {
+                  scene.removeChild(entity);
+                  loadedModels.delete(model.url);
+                }
+              }
+            });
+
+            // Update the distance display
+            if (nearestModel) {
+              distanceDisplay.textContent = `${minDistance.toFixed(2)}m from ${
+                nearestModel.info.split(",")[0]
+              }`;
+              if (minDistance <= 2) {
+                distanceDisplay.textContent = `Loading model...`;
+              }
+            } else {
+              distanceDisplay.textContent = "No models available.";
+            }
+          },
+          (err) => {
+            logToUI(`Error: Cannot get location. Code: ${err.code}`);
+            distanceDisplay.textContent = "Error: Cannot get location.";
+          },
+          {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            timeout: 27000
+          }
+        );
+      }
+
+      window.onload = () => {
+        logToUI("Application started.");
+        updateLocationAndModels();
+      };
+    </script>
+  </body>
+</html>
