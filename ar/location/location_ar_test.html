@@ -159,7 +159,7 @@
                 nearestModel = model;
               }
 
-              if (distance <= 2 && !loadedModels.has(model.url)) {
+              if (distance <= 5 && !loadedModels.has(model.url)) {
                 logToUI(`Model is within 2m, loading: ${model.info}`);
                 let modelEntity = document.createElement("a-entity");
                 modelEntity.setAttribute(
@@ -169,7 +169,7 @@
                 setModel(model, modelEntity);
                 scene.appendChild(modelEntity);
                 loadedModels.add(model.url);
-              } else if (distance > 2 && loadedModels.has(model.url)) {
+              } else if (distance > 20 && loadedModels.has(model.url)) {
                 logToUI(`User moved away, removing model: ${model.info}`);
                 const entity = document.querySelector(
                   `[gltf-model="${model.url}"]`
